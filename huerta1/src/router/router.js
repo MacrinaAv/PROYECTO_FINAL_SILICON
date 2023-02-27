@@ -144,11 +144,11 @@ router.put('/resetpassword/:id',(req,res)=>{
 });
 
 //LISTAR USUARIOS
-router.get('/usuarios', verificarToken, (req,res)=>{
-   jwt.verify(req.token,'huerta1Key',(err,valido)=>{
-      if(err){
-         res.sendStatus(403);
-      }else{
+router.get('/usuarios', (req,res)=>{
+   //jwt.verify(req.token,'huerta1Key',(err,valido)=>{
+   //   if(err){
+   //      res.sendStatus(403);
+   //   }else{
          let query= `SELECT u.username, concat_ws(" ", p.nombre,p.apellido) Nombre, up.estado FROM huerta.usuarios as u 
          inner join huerta.usuario_persona as up
          inner join huerta.personas as p
@@ -161,15 +161,15 @@ router.get('/usuarios', verificarToken, (req,res)=>{
             console.log(err);
          };
       });
-      };
-   });
+      //};
+   //});
 });
 ///Lista las huertas de un usuario en particular con numero de plantas correspondientes
-router.get('/mihuerta/:id_usuario', verificarToken, (req,res)=>{
-   jwt.verify(req.token,'huerta1Key',(err,valido)=>{
-      if(err){
-         res.sendStatus(403);
-      }else{
+router.get('/mihuerta/:id_usuario', (req,res)=>{
+   // jwt.verify(req.token,'huerta1Key',(err,valido)=>{
+   //    if(err){
+   //       res.sendStatus(403);
+   //    }else{
          let id_usuario= req.params.id_usuario;
          let query= `SELECT uh.id_usuario, uh.id_huerta,count(hp.id_huerta) Tipos_de_Plantas FROM huerta.usuario_huerta AS uh 
          LEFT JOIN huerta.huerta_planta AS hp ON uh.id_huerta=hp.id_huerta WHERE uh.id_usuario='${id_usuario}' GROUP BY id_huerta ;`;
@@ -180,15 +180,15 @@ router.get('/mihuerta/:id_usuario', verificarToken, (req,res)=>{
                res.send('ocurrió un error en el servidor');
             }
          });
-      }
-   })
+   //    }
+   // })
 });
 //AGREGAR HUERTA 
-router.post('/mihuerta/:id_usuario',verificarToken,(req,res)=>{
-   jwt.verify(req.token, 'huerta1Key',(err,valido)=>{
-      if(err){
-         res.sendStatus(403);
-      }else{
+router.post('/mihuerta/:id_usuario',(req,res)=>{
+   // jwt.verify(req.token, 'huerta1Key',(err,valido)=>{
+   //    if(err){
+   //       res.sendStatus(403);
+   //    }else{
          const {nombre,localidad} = req.body
          let id_usuario= req.params.id_usuario;
          let query =`INSERT INTO huerta.huerta ( nombre, localidad) VALUES ('${nombre}','${localidad}');`;
@@ -219,8 +219,8 @@ router.post('/mihuerta/:id_usuario',verificarToken,(req,res)=>{
                res.send('El error es: '+ err);
             };
          }); 
-       }
-   });
+   //     }
+   // });
 });
 // DAR DE BAJA A UN USUARIO DE UNA DE SUS HUERTAS 
 
@@ -234,11 +234,11 @@ router.post('/mihuerta/:id_usuario',verificarToken,(req,res)=>{
 ////////////////////////////
 
 ///LISTAR Huertas con cantidad de usuarios por huerta
-router.get('/huertas', verificarToken, (req,res)=>{
-   jwt.verify(req.token,'huerta1Key',(err,valido)=>{
-      if(err){
-         res.sendStatus(403);
-      }else{
+router.get('/huertas', (req,res)=>{
+   // jwt.verify(req.token,'huerta1Key',(err,valido)=>{
+   //    if(err){
+   //       res.sendStatus(403);
+   //    }else{
          let query= `SELECT h.nombre Nombre, h.localidad Localidad, count(uh.id_huerta) Usuarios FROM huerta.huerta as h 
          INNER JOIN huerta.usuario_huerta as uh where h.id_huerta=uh.id_huerta 
          group by uh.id_huerta;`;
@@ -250,15 +250,15 @@ router.get('/huertas', verificarToken, (req,res)=>{
             console.log(err);
          }
        })
-      }
-   })
+   //    }
+   // })
  });
 ///Muestra los usuarios de una huerta en particular con el id de la huerta
 router.get('/huertas/:id_huerta',(req,res)=>{
-   jwt.verify(req.token,'huerta1Key',(err,valido)=>{
-      if(err){
-         res.sendStatus(403);
-      }else{
+   // jwt.verify(req.token,'huerta1Key',(err,valido)=>{
+   //    if(err){
+   //       res.sendStatus(403);
+   //    }else{
          let id_huerta= req.params.id_huerta;
          let query= `SELECT u.username FROM (SELECT uh.id_usuario, h.nombre Nombre FROM huerta.huerta as h 
          INNER JOIN huerta.usuario_huerta as uh WHERE h.id_huerta=uh.id_huerta and h.id_huerta='${id_huerta}') AS T 
@@ -270,8 +270,8 @@ router.get('/huertas/:id_huerta',(req,res)=>{
                res.send('ocurrió un error en el servidor');
             }
          });
-      }
-   })
+   //    }
+   // })
 });
 
    
@@ -282,23 +282,23 @@ router.get('/huertas/:id_huerta',(req,res)=>{
 /////////PLANTAS//////////
 /////////////////////////
 //Lista de Plantas con cantidad de comentarios
-router.get('/plantas', verificarToken, (req,res)=>{
-   jwt.verify(req.token,'huerta1Key',(err,valido)=>{
-      if(err){
-         res.sendStatus(403);
-      }else{
+router.get('/plantas', (req,res)=>{
+   // jwt.verify(req.token,'huerta1Key',(err,valido)=>{
+   //    if(err){
+   //       res.sendStatus(403);
+   //    }else{
          let query= `SELECT pl.nombre, pl.comentario, pl.epoca, pl.luna, pl.forma,  count(cp.id_planta) Comentarios FROM huerta.plantas AS pl 
          LEFT JOIN comentario_planta AS cp ON pl.id_planta=cp.id_planta GROUP BY cp.id_planta;`;
-      mysqlConeccion.query(query,(err,registros)=>{
-          if(!err){
-           console.log(registros.lenght)
-             res.json(registros);
-          }else{
-             console.log(err);
-          }
-       })
-      }
-   })
+         mysqlConeccion.query(query,(err,registros)=>{
+            if(!err){
+               console.log(registros.lenght)
+               res.json(registros);
+            }else{
+               console.log(err);
+            }
+         })
+   //    }
+   // })
  });
 
 
