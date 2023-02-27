@@ -164,6 +164,69 @@ router.get('/usuarios', verificarToken, (req,res)=>{
       };
    });
 });
+///Lista las huertas de un usuario en particular con numero de plantas correspondientes
+router.get('/mihuerta/:id_usuario', verificarToken, (req,res)=>{
+   jwt.verify(req.token,'huerta1Key',(err,valido)=>{
+      if(err){
+         res.sendStatus(403);
+      }else{
+         let id_usuario= req.params.id_usuario;
+         let query= `SELECT uh.id_usuario, uh.id_huerta,count(hp.id_huerta) Tipos_de_Plantas FROM huerta.usuario_huerta AS uh 
+         LEFT JOIN huerta.huerta_planta AS hp ON uh.id_huerta=hp.id_huerta WHERE uh.id_usuario='${id_usuario}' GROUP BY id_huerta ;`;
+         mysqlConeccion.query(query,(err,registros)=>{
+            if(!err){
+               res.send(registros);
+            }else{
+               res.send('ocurrió un error en el servidor');
+            }
+         });
+      }
+   })
+});
+//AGREGAR HUERTA 
+router.post('/mihuerta/:id_usuario',verificarToken,(req,res)=>{
+   jwt.verify(req.token, 'huerta1Key',(err,valido)=>{
+      if(err){
+         res.sendStatus(403);
+      }else{
+         const {nombre,localidad} = req.body
+         let id_usuario= req.params.id_usuario;
+         let query =`INSERT INTO huerta.huerta ( nombre, localidad) VALUES ('${nombre}','${localidad}');`;
+         //INSERT INTO `huerta`.`huerta` (`nombre`, `localidad`) VALUES ('Pato', 'Oberá');
+         mysqlConeccion.query(query, (err,rows)=>{
+            if(!err){
+               res.send('Se inserto correctamente la huerta: '+nombre+' ubicada en: '+localidad);
+            }else{
+               console.log(err);
+               res.send('El error es: '+ err);
+            };
+         });
+         let query1 =`SELECT id_huerta FROM huerta.huerta WHERE nombre='${nombre}'; `;
+         mysqlConeccion.query(query1, (err,rows)=>{
+            const {id_huerta}=rows[0];
+            if(!err){
+               let query2 =`INSERT INTO huerta.usuario_huerta ( id_usuario, id_huerta) VALUES ('${id_usuario}','${id_huerta}');`;
+               mysqlConeccion.query(query2, (err,rows)=>{
+                  if(!err){
+                     //res.send('Se inserto correctamente la relacion entre la huerta: '+id_huerta+' y el usuario: '+id_usuario);
+                  }else{
+                     console.log(err);
+                     res.send('El error es: '+ err);
+                  };
+               });
+            }else{
+               console.log(err);
+               res.send('El error es: '+ err);
+            };
+         }); 
+       }
+   });
+});
+// DAR DE BAJA A UN USUARIO DE UNA DE SUS HUERTAS 
+
+
+
+
 
 
 /////////////////////////////
@@ -191,7 +254,7 @@ router.get('/huertas', verificarToken, (req,res)=>{
    })
  });
 ///Muestra los usuarios de una huerta en particular con el id de la huerta
-router.put('/huertas/:id_huerta',(req,res)=>{
+router.get('/huertas/:id_huerta',(req,res)=>{
    jwt.verify(req.token,'huerta1Key',(err,valido)=>{
       if(err){
          res.sendStatus(403);
