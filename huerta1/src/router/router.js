@@ -226,8 +226,33 @@ router.post('/mihuerta/:id_usuario',(req,res)=>{
 
 
 
+//Cambiar Datos y estado de la HUERTA
+router.put('/mihuerta/:id_usuario/:id_huerta',(req,res)=>{
+   let id_huerta= req.params.id_huerta;
+   const {nombre,localidad,estado}=req.body// el estado debe cambiar el estado de la relacion.. asi se elimina al usuario de la huerta, si hay un solo usuario se da de baja la huerta
+   let query= `UPDATE huerta.huerta SET nombre='${nombre}' WHERE id_huerta='${id_huerta}'`;
+   mysqlConeccion.query(query,(err,registros)=>{
+      if(!err){
+       res.send('Se cambió el nombre de la huerta a: '+nombre);
+      }else{
+         res.send('ocurrió un error en el servidor');
+      }
+   });
+});
 
-
+// //Cambiar NOMBRE HUERTA
+// router.put('/mihuerta/:id_huerta',(req,res)=>{
+//    let id_huerta= req.params.id_huerta;
+//    const {nombre}=req.body
+//    let query= `UPDATE huerta.huerta SET nombre='${nombre}' WHERE id_huerta='${id_huerta}'`;
+//    mysqlConeccion.query(query,(err,registros)=>{
+//       if(!err){
+//        res.send('se cambió el nombre '+nombre);
+//       }else{
+//          res.send('ocurrió un error en el servidor');
+//       }
+//    });
+// });
 
 /////////////////////////////
 /////////HUERTA/////////////
